@@ -1,0 +1,8 @@
+{
+  "app": "java -cp target/classes:target/dependency/* com.cloudforgeci.app.CloudForgeCIApp",
+  "context": {
+    "tier": "public",
+    "variant": "ec2"
+
+  }
+}
