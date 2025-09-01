@@ -1,7 +1,6 @@
 {
-  "app": "java -cp target/classes:target/dependency/* com.cloudforgeci.app.CloudForgeCIApp",
+  "app": "java -cp target/classes:target/dependency/* com.cloudforgeci.samples.app.CloudForgeCommunitySample",
   "context": {
-    "tier": "public",
     "variant": "ec2"
 
   }
