@@ -16,20 +16,23 @@
 
     <dependency>
       <groupId>com.cloudforgeci</groupId>
-      <artifactId>cfc-public-jenkins-ec2</artifactId>
-      <version>${project.version}</version>
+      <artifactId>cloudforge-community-jenkins-ec2</artifactId>
+      <version>(1.0.0,2.0.0]</version>
     </dependency>
-    <dependency><groupId>com.cloudforgeci</groupId>
-      <artifactId>cfc-public-jenkins-ec2-domain-ssl</artifactId>
-      <version>${project.version}</version>
+    <dependency>
+      <groupId>com.cloudforgeci</groupId>
+      <artifactId>cloudforge-community-jenkins-ec2-ssl</artifactId>
+      <version>(1.0.0,2.0.0]</version>
     </dependency>
-    <dependency><groupId>com.cloudforgeci</groupId>
-      <artifactId>cfc-public-jenkins-fargate-efs-ecs</artifactId>
-      <version>${project.version}</version>
+    <dependency>
+      <groupId>com.cloudforgeci</groupId>
+      <artifactId>cloudforge-community-jenkins-fargate</artifactId>
+      <version>(1.0.0,2.0.0]</version>
     </dependency>
-    <dependency><groupId>com.cloudforgeci</groupId>
-      <artifactId>cfc-public-jenkins-ecs-domain-ssl</artifactId>
-      <version>${project.version}</version>
+    <dependency>
+      <groupId>com.cloudforgeci</groupId>
+      <artifactId>cloudforge-community-jenkins-fargate-ssl</artifactId>
+      <version>(1.0.0,2.0.0]</version>
     </dependency>
 
     <dependency>
