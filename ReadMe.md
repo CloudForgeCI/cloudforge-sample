@@ -92,12 +92,18 @@ Control deployments without editing Java code.
 | `cpuTargetUtilization` | integer (Minimum Instances e.g. `75`      | `60`                                      | CPU Target Utilization                         |
 
 
-    **Topology**
-    *Service (scalable / highly-available)*
+ ---
+
+**Topology**
+
+*Service (scalable / highly-available)*
+
 Runs Jenkins as a managed service (ECS/Fargate service or an EC2 Auto Scaling Group) behind an ALB. Auto Scaling policies add/remove tasks or instances based on load (CPU/memory, request rate, queue depth). You get rolling updates, self-healing, and minimal downtime. Requires shared storage (e.g., EFS) for the Jenkins home so new tasks come up warm. Best for teams, bursty CI, and uptime expectations.
+
 *Single Node (simple / cost-lean)*
+
 One Jenkins controller (a single Fargate task or EC2 instance) with no horizontal scaling. Fewer moving parts, lower cost, and straightforward ops—but restarts mean brief downtime and throughput is capped at that one node. Use EBS (EC2) or EFS (Fargate) if you want persistence. Great for dev, POCs, solo use, or steady low-volume pipelines.
----
+
 
 ### CLI examples
 
@@ -138,7 +144,7 @@ A future release will allow defining deployments with a typed Java class instead
 
 Example shape:
 
-```java
+```
 var ctx = new DeploymentContext.Builder()
     .tier(DeploymentContext.Tier.PUBLIC)
     .variant(DeploymentContext.Variant.FARGATE_DOMAIN)
@@ -150,7 +156,7 @@ var ctx = new DeploymentContext.Builder()
     .authMode(DeploymentContext.AuthMode.NONE)
     .cpu(1024)
     .memory(2048)
-    .build();
+    .build();'
 
 new JenkinsStack(app, "JenkinsStack", StackProps.builder().build(), ctx);
 ```
