@@ -1,7 +1,14 @@
 {
   "app": "java -cp target/classes:target/dependency/* com.cloudforgeci.samples.app.CloudForgeCommunitySample",
   "context": {
-    "variant": "ec2"
+    "cfc": {
+      "topology": "service",
+      "runtime": "fargate",
+      "domain": null,
+      "subdomain": "jenkins",
+      "enableSsl": false,
+      "enableFlowlogs": false
+    }
 
   }
 }
