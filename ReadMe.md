@@ -17,10 +17,10 @@ This repo is the quickstart demo — opinionated defaults, multiple deployment f
 
 ## 🛣 Roadmap
 
-**Free Tier**
+**Open-Source**
 - NAT Gateway + Private VPC subnet support *(coming soon)*
 
-**Enterprise Tier**
+**Enterprise**
 - Private Endpoints for ECR, S3, CloudWatch
 - Web Application Firewall (WAF)
 - Automated Backups
@@ -46,14 +46,14 @@ This repo is the quickstart demo — opinionated defaults, multiple deployment f
    Pass context values at deploy time or via `cdk.json`.
 
    Example context keys:
-   - `domainName` = `jenkins.example.com`
-   - `domainZone` = `example.com`
-   - `variant` = `ec2` | `ec2-domain` | `fargate` | `fargate-domain`
+   - `subdomain` = `jenkins.example.com`
+   - `domain` = `example.com`
+   - `runtime` = `ec2` | `ec2-domain` | `fargate` | `fargate-domain`
 
 4. **Deploy**
    ```bash
    mvn clean package
-   cdk deploy -c variant=fargate-domain -c domain=example.com -c subdomain=jenkins
+   cdk deploy -c cfc='{"topology":"service", "runtime":"fargate", "domain":"example.com", "subdomain":"jenkins", "enableSsl": true}'
    ```
 
 5. **Access Jenkins**
@@ -67,44 +67,53 @@ Control deployments without editing Java code.
 
 ### Current usable context keys
 
-| Key                  | Values / Example                                   | Default            | Notes |
-|----------------------|----------------------------------------------------|--------------------|-------|
-| `variant`            | `ec2`/ `ec2-domain` / `fargate` / `fargate-domain` | `ec2`                | `*-domain` variants expect Route53 + ACM. |
-| `env`                | `dev`                                              | `stage` | `prod`                                    | `dev`                | Used for naming + tagging. |
-| `domain`             | `example.com`                                      | _none_             | Used with `subdomain` if `fqdn` not set. |
-| `subdomain`          | `jenkins`                                          | _none_             | Used to build `fqdn`. |
-| `fqdn` / `domainName`| `jenkins.example.com`                              | _none_             | Wins over domain + subdomain. |
-| `domainZone`         | `example.com`                                      | _none_             | Must exist in Route53 for `*-domain` variants. |
-| `networkMode`        | `public-no-nat`                                    | `private-with-nat`                        | `public-no-nat`      | Future free support for NAT Gateway + private subnets. |
-| `wafEnabled`         | `true` / `false`                                   | `false`            | Enterprise only. |
-| `cloudfront`         | `true` / `false`                                   | `false`            | Optional CloudFront in front of ALB. |
-| `authMode`           | `none` / `alb-oidc`/ `jenkins-oidc`                | `none`               | Enterprise: integrates SSO. |
-| `ssoInstanceArn`     | `arn:aws:sso::...`                                 | _none_             | Enterprise only. |
-| `ssoGroupId`         | `UUID`                                             | _none_             | Enterprise only. |
-| `ssoTargetAccountId` | `123456789012`                                     | _none_             | Enterprise only. |
-| `artifactsBucket`    | `my-ci-artifacts`                                  | _auto_             | Custom bucket for build artifacts. |
-| `artifactsPrefix`    | `jenkins/job/${JOB_NAME}/${BUILD_NUMBER}`          | default shown      | S3 key prefix. |
-| `lbType`             | `alb`                                              | `nlb`                                               | `alb`                | Type of load balancer. |
-| `cpu`                | integer (Fargate vCPU, e.g. `1024`)                | `1024`             | Task size for Fargate. |
-| `memory`             | integer (MiB, e.g. `2048`)                         | `2048`             | Task size for Fargate. |
+| Key                    | Values / Example                          | Default                                   | Notes                                          |
+|------------------------|-------------------------------------------|-------------------------------------------|------------------------------------------------|
+| `runtime`              | `ec2` / `fargate`                         | `*-domain` variants expect Route53 + ACM. |
+| `env`                  | `dev`                                     | `stage`                                   | `prod`                                         | `dev`                | Used for naming + tagging. |
+| `domain`               | `example.com`                             | _none_                                    | Used with `subdomain` if `fqdn` not set.       |
+| `subdomain`            | `jenkins`                                 | _none_                                    | Used to build `fqdn`.                          |
+| `fqdn`                 | `jenkins.example.com`                     | _none_                                    | Wins over domain + subdomain.                  |
+| `domain`               | `example.com`                             | _none_                                    | Must exist in Route53 for `*-domain` variants. |
+| `topology`             | `service` / `single-node`                 | `service`                                 | Future free support for S3, SES, Lambda        |
+| `enableSsl`            | `true` / `false`                          | `false`                                   | Enterprise only.                               |
+| `enableFlowlogs`       | `true` / `false`                          | `false`                                   | Optional CloudFront in front of ALB.           |
+| `authMode`             | `none` / `alb-oidc`/ `jenkins-oidc`       | `none`                                    | Enterprise: integrates SSO.                    |
+| `ssoInstanceArn`       | `arn:aws:sso::...`                        | _none_                                    | Enterprise only.                               |
+| `ssoGroupId`           | `UUID`                                    | _none_                                    | Enterprise only.                               |
+| `ssoTargetAccountId`   | `123456789012`                            | _none_                                    | Enterprise only.                               |
+| `artifactsBucket`      | `my-ci-artifacts`                         | _auto_                                    | Custom bucket for build artifacts.             |
+| `artifactsPrefix`      | `jenkins/job/${JOB_NAME}/${BUILD_NUMBER}` | default shown                             | S3 key prefix.                                 |
+| `lbType`               | `alb`                                     | `alb`                                     | Type of load balancer.                         |
+| `cpu`                  | integer (Fargate vCPU, e.g. `1024`)       | `1024`                                    | Task size for Fargate.                         |
+| `memory`               | integer (MiB, e.g. `2048`)                | `2048`                                    | Task size for Fargate.                         |
+| `minInstanceCapacity`  | integer (Minimum Instances e.g. `2`       | `0`                                       | Minimum Instance Capacity                      |
+| `maxInstanceCapacity`  | integer (Minimum Instances e.g. `10`      | `0`                                       | Maximum Instance Capacity                      |
+| `cpuTargetUtilization` | integer (Minimum Instances e.g. `75`      | `60`                                      | CPU Target Utilization                         |
 
+
+    **Topology**
+    *Service (scalable / highly-available)*
+Runs Jenkins as a managed service (ECS/Fargate service or an EC2 Auto Scaling Group) behind an ALB. Auto Scaling policies add/remove tasks or instances based on load (CPU/memory, request rate, queue depth). You get rolling updates, self-healing, and minimal downtime. Requires shared storage (e.g., EFS) for the Jenkins home so new tasks come up warm. Best for teams, bursty CI, and uptime expectations.
+*Single Node (simple / cost-lean)*
+One Jenkins controller (a single Fargate task or EC2 instance) with no horizontal scaling. Fewer moving parts, lower cost, and straightforward ops—but restarts mean brief downtime and throughput is capped at that one node. Use EBS (EC2) or EFS (Fargate) if you want persistence. Great for dev, POCs, solo use, or steady low-volume pipelines.
 ---
 
 ### CLI examples
 
 **Fargate + custom ci domain (`jenkins.example.com`)**
 ```bash
-cdk deploy   -c variant=fargate-domain   -c domain=example.com   -c subdomain=jenkins
+cdk deploy   -c cfc='{"runtime":"fargate-domain", "domain":"example.com" "subdomain":"jenkins"}'
 ```
 
 **EC2 + explicit FQDN**
 ```bash
-cdk deploy   -c variant=ec2-domain   -c domainName=jenkins.example.com   -c domainZone=example.com
+cdk deploy   -c cfc='{"runtime":"ec2-domain", "domain":"example.com", "subdomain":"example.com" }'
 ```
 
 **Plain EC2 (no domain records created)**
 ```bash
-cdk deploy -c variant=ec2
+cdk deploy -c cfc='{"runtime":"ec2"}'
 ```
 
 ### `cdk.json` example
@@ -114,9 +123,9 @@ cdk deploy -c variant=ec2
   "app": "java -cp target/classes:target/dependency/* com.cloudforgeci.samples.app.CloudForgeCommunitySample",
   "context": {
     "variant": "fargate-domain",
-    "domain": "example.com",
+    "fqdn": "jenkins.example.com",
     "subdomain": "jenkins",
-    "domainZone": "example.com"
+    "domain": "example.com"
   }
 }
 ```

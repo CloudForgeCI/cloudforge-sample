@@ -9,6 +9,7 @@
   <properties>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
+    <cloudforge-community.version>[2.0.0,3.0.0)</cloudforge-community.version>
   </properties>
 
 
@@ -17,22 +18,27 @@
     <dependency>
       <groupId>com.cloudforgeci</groupId>
       <artifactId>cloudforge-community-jenkins-ec2</artifactId>
-      <version>(1.0.0,2.0.0]</version>
+      <version>${cloudforge-community.version}</version>
     </dependency>
     <dependency>
       <groupId>com.cloudforgeci</groupId>
       <artifactId>cloudforge-community-jenkins-ec2-ssl</artifactId>
-      <version>(1.0.0,2.0.0]</version>
+      <version>${cloudforge-community.version}</version>
     </dependency>
     <dependency>
       <groupId>com.cloudforgeci</groupId>
       <artifactId>cloudforge-community-jenkins-fargate</artifactId>
-      <version>(1.0.0,2.0.0]</version>
+      <version>${cloudforge-community.version}</version>
     </dependency>
     <dependency>
       <groupId>com.cloudforgeci</groupId>
       <artifactId>cloudforge-community-jenkins-fargate-ssl</artifactId>
-      <version>(1.0.0,2.0.0]</version>
+      <version>${cloudforge-community.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.cloudforgeci</groupId>
+      <artifactId>cloudforge-community-fargate-service-node</artifactId>
+      <version>${cloudforge-community.version}</version>
     </dependency>
 
     <dependency>
