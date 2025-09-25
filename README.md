@@ -29,37 +29,47 @@ This repo is the quickstart demo — opinionated defaults, multiple deployment f
 
 ---
 
-## ⚡ Quickstart
+### Quick Start
 
-1. **Clone this repo**
-   ```bash
-   git clone https://github.com/CloudForgeCI/cloudforge-sample.git
-   cd cloudforge-sample
-   ```
+```bash
+# Run the interactive deployer
+./deploy-interactive.sh
 
-2. **Bootstrap CDK (if not already done)**
-   ```bash
-   cdk bootstrap aws://<account>/<region>
-   ```
+# Or manually
+mvn compile
+mvn exec:java -Dexec.mainClass="com.cloudforgeci.samples.app.InteractiveDeployer"
+```
 
-3. **Configure your deployment**  
-   Pass context values at deploy time or via `cdk.json`.
+### Features
 
-   Example context keys:
-   - `subdomain` = `jenkins.example.com`
-   - `domain` = `example.com`
-   - `runtime` = `ec2` | `ec2-domain` | `fargate` | `fargate-domain`
+- **Modular Architecture**: Uses SystemContext orchestration layer for expandable deployment types
+- **Strategy Pattern**: Easily extensible deployment strategies
+- **Multiple Deployment Types**:
+  - Jenkins (Fargate/EC2) - ✅ Complete
+  - S3 + CloudFront (Static Website) - 🚧 Coming Soon
+  - S3 + CloudFront + SES + Lambda (Website + Mailer) - 🚧 Coming Soon
+- **Interactive Configuration**: Prompts for all necessary parameters with sensible defaults
+- **CDK Integration**: Generates proper CDK context and synthesizes stacks
 
-4. **Deploy**
-   ```bash
-   mvn clean package
-   cdk deploy -c cfc='{"topology":"service", "runtime":"fargate", "domain":"example.com", "subdomain":"jenkins", "enableSsl": true}'
-   ```
+### Prerequisites
 
-5. **Access Jenkins**
-   Once deployed, CDK outputs the Jenkins URL (with SSL).
+1. **AWS CDK CLI**: `npm install -g aws-cdk`
+2. **AWS Credentials**: `aws configure`
+3. **Java 21+**: Required for compilation
+4. **Maven**: For building the project
 
----
+
+### Usage Examples
+
+#### With Custom Stack Name
+```bash
+java -cp "target/classes:target/dependency/*" com.cloudforgeci.samples.app.InteractiveDeployer my-jenkins-ec2
+```
+
+#### Interactive Mode
+```bash
+java -cp "target/classes:target/dependency/*" com.cloudforgeci.samples.app.InteractiveDeployer
+```
 
 ## 🔧 Deployment Context
 
@@ -105,86 +115,37 @@ Runs Jenkins as a managed service (ECS/Fargate service or an EC2 Auto Scaling Gr
 One Jenkins controller (a single Fargate task or EC2 instance) with no horizontal scaling. Fewer moving parts, lower cost, and straightforward ops—but restarts mean brief downtime and throughput is capped at that one node. Use EBS (EC2) or EFS (Fargate) if you want persistence. Great for dev, POCs, solo use, or steady low-volume pipelines.
 
 
-### CLI examples
-
-**Fargate + custom ci domain (`jenkins.example.com`)**
-```bash
-cdk deploy   -c cfc='{"runtime":"fargate-domain", "domain":"example.com" "subdomain":"jenkins"}'
-```
-
-**EC2 + explicit FQDN**
-```bash
-cdk deploy   -c cfc='{"runtime":"ec2-domain", "domain":"example.com", "subdomain":"example.com" }'
-```
-
-**Plain EC2 (no domain records created)**
-```bash
-cdk deploy -c cfc='{"runtime":"ec2"}'
-```
-
 ### `cdk.json` example
 
 ```json
 {
-  "app": "java -cp target/classes:target/dependency/* com.cloudforgeci.samples.app.CloudForgeCommunitySample",
-  "context": {
-    "variant": "fargate-domain",
-    "fqdn": "jenkins.example.com",
-    "subdomain": "jenkins",
-    "domain": "example.com"
-  }
+  "app": "java -cp target/classes:target/dependency/* com.cloudforgeci.samples.app.InteractiveDeployer",
+  "context": {}
 }
 ```
 
----
-
-## 🧩 Planned: `DeploymentContext` Java API
-
-A future release will allow defining deployments with a typed Java class instead of CLI flags.
-
-Example shape:
-
-```
-var ctx = new DeploymentContext.Builder()
-    .tier(DeploymentContext.Tier.PUBLIC)
-    .variant(DeploymentContext.Variant.FARGATE_DOMAIN)
-    .env(DeploymentContext.Env.DEV)
-    .domain("example.com")
-    .subdomain("jenkins")
-    // or .fqdn("jenkins.example.com")
-    .networkMode(DeploymentContext.NetworkMode.PUBLIC_NO_NAT)
-    .authMode(DeploymentContext.AuthMode.NONE)
-    .cpu(1024)
-    .memory(2048)
-    .build();'
-
-new JenkinsStack(app, "JenkinsStack", StackProps.builder().build(), ctx);
-```
-
-Until then, use the `-c` context keys shown above.
-
----
 
 ## 🆓 Free vs Enterprise
 
 CloudForgeCI comes in two editions:
 
 - **Free Edition**
-   - Fully open, with no restrictions.
-   - Use in personal, enterprise, or commercial projects at no cost.
-   - Includes core features: EC2/Fargate deploys, ALB, Domain/Subdomain, SSL, Multi-AZ.
+  - Fully open, with no restrictions.
+  - Use in personal, enterprise, or commercial projects at no cost.
+  - Includes core features: EC2/Fargate deploys, ALB, Domain/Subdomain, SSL, Multi-AZ.
 
 - **Enterprise Edition** *(commercial)*
-   - Adds advanced features for production workloads:
-      - Web Application Firewall (WAF)
-      - Private Endpoints (ECR, S3, CloudWatch)
-      - Single Sign-On (SSO with ALB IdP + Jenkins integration)
-      - Automated Backups
-      - Advanced Monitoring
-   - Commercial support & feature roadmap.
+  - Adds advanced features for production workloads:
+    - Web Application Firewall (WAF)
+    - Private Endpoints (ECR, S3, CloudWatch)
+    - Single Sign-On (SSO with ALB IdP + Jenkins integration)
+    - Automated Backups
+    - Advanced Monitoring
+  - Commercial support & feature roadmap.
 
 - **Veteran-Owned Businesses** ❤️
-   - Eligible to receive **Enterprise Edition features free of charge**.
-   - Our way of honoring and supporting those who’ve served.
+  - Eligible to receive **Enterprise Edition features free of charge**.
+  - Our way of honoring and supporting those who’ve served.
 
 **Bottom line:** start free, scale into enterprise features when your needs demand it — or claim full Enterprise benefits free if you’re a veteran-owned business.
+
