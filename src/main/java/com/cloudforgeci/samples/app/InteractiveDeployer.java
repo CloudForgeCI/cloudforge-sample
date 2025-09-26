@@ -212,7 +212,7 @@ public class InteractiveDeployer {
         System.out.println("🔍 DEBUG: DeploymentContext.from(app) returned:");
         System.out.println("  - runtime: " + cfc.runtime());
         System.out.println("  - topology: " + cfc.topology());
-        System.out.println("  - stackName: " + cfc.stackName());
+        System.out.println("  - stackName: " + config.stackName);
         IAMProfile iamProfile = IAMProfileMapper.mapFromSecurity(config.securityProfile);
         
         StackProps props = StackProps.builder()
@@ -867,7 +867,7 @@ public class InteractiveDeployer {
     /**
      * Jenkins deployment strategy using SystemContext orchestration layer.
      */
-    private static class JenkinsDeploymentStrategy implements DeploymentStrategy {
+    static class JenkinsDeploymentStrategy implements DeploymentStrategy {
         @Override
         public void collectConfiguration(DeploymentConfig config) {
             config.runtime = RuntimeType.valueOf(
