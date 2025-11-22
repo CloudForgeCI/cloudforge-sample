@@ -22,21 +22,73 @@ public class CloudForgeCommunitySample {
   public static void main(final String[] args) {
     App app = new App();
 
+    // Check if we have a pre-configured cfc context (from cdk.json)
+    // or if we need to build it from individual context parameters
+    Object cfcObj = app.getNode().tryGetContext("cfc");
+
+    if (cfcObj == null) {
+      // Build cfc context from individual --context cfc.* parameters
+      Map<String, Object> cfcContext = new java.util.HashMap<>();
+
+      // Read all cfc.* parameters and build the context map
+      String[] contextKeys = {
+        "runtime", "topology", "securityProfile", "stackName", "region",
+        "domain", "subdomain", "enableSsl", "env", "tier",
+        "networkMode", "wafEnabled", "cloudfrontEnabled", "authMode",
+        "cpu", "memory", "instanceType", "minInstanceCapacity", "maxInstanceCapacity",
+        "cpuTargetUtilization", "enableMonitoring", "enableEncryption",
+        "logRetentionDays", "healthCheckGracePeriod", "healthCheckInterval",
+        "healthCheckTimeout", "healthyThreshold", "unhealthyThreshold",
+        "bastionCidr", "lbType", "enableFlowlogs", "createZone", "artifactsPrefix",
+        "autoProvisionIdentityCenter", "identityCenterGroupName",
+        "ssoInstanceArn", "ssoGroupId", "ssoTargetAccountId"
+      };
+
+      for (String key : contextKeys) {
+        Object value = app.getNode().tryGetContext("cfc." + key);
+        if (value != null) {
+          cfcContext.put(key, value);
+        }
+      }
+
+      // Set the cfc context on the app
+      if (!cfcContext.isEmpty()) {
+        app.getNode().setContext("cfc", cfcContext);
+      }
+    }
+
     DeploymentContext cfc = DeploymentContext.from(app);
 
+    // Use region from DeploymentContext (cdk.json or deployment-context.json) with fallback to environment variable
+    String region = cfc.region() != null ? cfc.region() : System.getenv("CDK_DEFAULT_REGION");
+    String account = System.getenv("CDK_DEFAULT_ACCOUNT");
+
+    System.out.println("CloudForge deployment configuration:");
+    System.out.println("  Region: " + region);
+    System.out.println("  Account: " + account);
+    System.out.println("  Runtime: " + cfc.runtime());
+    System.out.println("  Security Profile: " + cfc.securityProfile());
+
     StackProps props = StackProps.builder().env(Environment.builder()
-            .account(System.getenv("CDK_DEFAULT_ACCOUNT"))
-            .region(System.getenv("CDK_DEFAULT_REGION")).build()).build();
+            .account(account)
+            .region(region).build()).build();
 
     // Get security profile from DeploymentContext
     SecurityProfile security = cfc.securityProfile();
     IAMProfile iamProfile = IAMProfileMapper.mapFromSecurity(security);
 
+    // Use stack name from context or default to runtime-based name
+    Object stackNameObj = app.getNode().tryGetContext("cfc.stackName");
+    String stackName = stackNameObj != null ? stackNameObj.toString() : null;
+    if (stackName == null || stackName.isEmpty()) {
+      stackName = (cfc.getRuntime() == RuntimeType.EC2) ? "JenkinsEc2" : "JenkinsFargate";
+    }
+
     // Create stacks based on runtime type
     if (cfc.getRuntime() == RuntimeType.EC2) {
-      new JenkinsEc2Stack(app, "JenkinsEc2", props, security, iamProfile);
+      new JenkinsEc2Stack(app, stackName, props, security, iamProfile);
     } else if (cfc.getRuntime() == RuntimeType.FARGATE) {
-      new JenkinsFargateStack(app, "JenkinsFargate", props, security, iamProfile);
+      new JenkinsFargateStack(app, stackName, props, security, iamProfile);
     } else {
       throw new IllegalArgumentException("Unsupported runtime type: " + cfc.getRuntime());
     }
