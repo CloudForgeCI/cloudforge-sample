@@ -1,35 +1,26 @@
-# Jenkins on AWS CDK (Java Edition) 🚀
+# CloudForge Sample Project
 
-Spin up a production-ready Jenkins CI/CD deployment in **minutes** with [AWS CDK for Java](https://docs.aws.amazon.com/cdk/latest/guide/work-with-cdk-java.html).  
-This repo is the quickstart demo — opinionated defaults, multiple deployment flavors, and a roadmap toward enterprise features.
+Deploy production-ready applications on AWS in minutes using [AWS CDK for Java](https://docs.aws.amazon.com/cdk/latest/guide/work-with-cdk-java.html).
 
----
-
-## ✨ Features
-
-- **EC2 or Fargate** – choose your compute type at deploy time
-- **Application Load Balancer (ALB)** – scalable, secure traffic routing
-- **Domain + Subdomain** – bring your own domain for a polished setup
-- **SSL/TLS** – encrypted by default with ACM certificates
-- **Multi–Availability Zones** – fault tolerance at no extra effort
+This repository demonstrates the CloudForge platform with opinionated defaults, multiple deployment options, and enterprise-grade compliance features.
 
 ---
 
-## 🛣 Roadmap
+## Features
 
-**Open-Source**
-- NAT Gateway + Private VPC subnet support *(coming soon)*
-
-**Enterprise**
-- Private Endpoints for ECR, S3, CloudWatch
-- Web Application Firewall (WAF)
-- Automated Backups
-- Single Sign-On (SSO) with ALB IdP protection + Jenkins integration
-- Advanced Monitoring
+- **15+ Supported Applications** - Jenkins, GitLab, Grafana, PostgreSQL, Redis, Vault, SonarQube, and more
+- **EC2 or Fargate** - Choose your compute type at deploy time
+- **Plugin Architecture** - Extensible application and compliance plugins via Java SPI
+- **Multi-Framework Compliance** - SOC2, PCI-DSS, HIPAA, GDPR out of the box
+- **OIDC Authentication** - Cognito, AWS Identity Center, or external providers
+- **Application Load Balancer** - Scalable, secure traffic routing with SSL/TLS
+- **Multi-Availability Zone** - Fault tolerance at no extra effort
 
 ---
 
-### Quick Start
+## Quick Start
+
+### Option 1: Interactive Deployer (Recommended)
 
 ```bash
 # Run the interactive deployer
@@ -40,16 +31,18 @@ mvn compile
 mvn exec:java -Dexec.mainClass="com.cloudforgeci.samples.app.InteractiveDeployer"
 ```
 
-### Features
+### Option 2: Deployment Context File
 
-- **Modular Architecture**: Uses SystemContext orchestration layer for expandable deployment types
-- **Strategy Pattern**: Easily extensible deployment strategies
-- **Multiple Deployment Types**:
-  - Jenkins (Fargate/EC2) - ✅ Complete
-  - S3 + CloudFront (Static Website) - 🚧 Coming Soon
-  - S3 + CloudFront + SES + Lambda (Website + Mailer) - 🚧 Coming Soon
-- **Interactive Configuration**: Prompts for all necessary parameters with sensible defaults
-- **CDK Integration**: Generates proper CDK context and synthesizes stacks
+```bash
+# Copy a deployment context template
+cp docs/deployment-contexts/examples/jenkins-dev.json deployment-context.json
+
+# Edit with your settings
+vim deployment-context.json
+
+# Deploy
+cdk deploy -c cfc=@deployment-context.json
+```
 
 ### Prerequisites
 
@@ -58,94 +51,286 @@ mvn exec:java -Dexec.mainClass="com.cloudforgeci.samples.app.InteractiveDeployer
 3. **Java 21+**: Required for compilation
 4. **Maven**: For building the project
 
+---
 
-### Usage Examples
+## Supported Applications
 
-#### With Custom Stack Name
-```bash
-java -cp "target/classes:target/dependency/*" com.cloudforgeci.samples.app.InteractiveDeployer my-jenkins-ec2
+| Category | Applications |
+|----------|-------------|
+| **CI/CD** | Jenkins, GitLab, Drone |
+| **Version Control** | Gitea |
+| **Monitoring** | Grafana, Prometheus |
+| **Databases** | PostgreSQL, Redis |
+| **Secrets Management** | HashiCorp Vault |
+| **Artifact Registry** | Nexus, Harbor |
+| **Collaboration** | Mattermost |
+| **Analytics** | Metabase, Apache Superset |
+| **Code Quality** | SonarQube |
+
+See [Application Catalog](docs/applications/README.md) for detailed documentation on each application.
+
+---
+
+## Deployment Context
+
+Control deployments via JSON configuration without editing Java code.
+
+### Key Configuration Options
+
+| Key | Values / Example | Default | Notes |
+|-----|------------------|---------|-------|
+| `applicationId` | `jenkins`, `gitlab`, `grafana`, etc. | _required_ | Application to deploy |
+| `runtime` | `ec2` / `fargate` | `fargate` | Compute type |
+| `securityProfile` | `dev` / `staging` / `production` | `dev` | Security posture |
+| `env` | `dev` / `stage` / `prod` | `dev` | Environment name |
+| `domain` | `example.com` | _none_ | Route53 domain |
+| `subdomain` | `jenkins` | _none_ | Service subdomain |
+| `topology` | `service` / `single-node` | `service` | Scaling mode |
+| `authMode` | `none` / `alb-oidc` / `application-oidc` | `none` | Authentication |
+| `complianceFrameworks` | `SOC2,HIPAA,PCI-DSS` | _none_ | Compliance frameworks |
+
+See [Deployment Context Reference](docs/deployment-contexts/README.md) for the complete configuration guide.
+
+---
+
+## Ready-to-Use Templates
+
+### By Application
+
+| Application | Development | Production |
+|-------------|-------------|------------|
+| Jenkins | [jenkins-dev.json](docs/deployment-contexts/examples/jenkins-dev.json) | [jenkins-production.json](docs/deployment-contexts/examples/jenkins-production.json) |
+| Mattermost | [mattermost-dev.json](docs/deployment-contexts/examples/mattermost-dev.json) | [mattermost-production.json](docs/deployment-contexts/examples/mattermost-production.json) |
+| Metabase | [metabase-dev.json](docs/deployment-contexts/examples/metabase-dev.json) | [metabase-production.json](docs/deployment-contexts/examples/metabase-production.json) |
+| GitLab | - | [gitlab-production.json](docs/deployment-contexts/examples/gitlab-production.json) |
+| Grafana | - | [grafana-production.json](docs/deployment-contexts/examples/grafana-production.json) |
+| Harbor | - | [harbor-production.json](docs/deployment-contexts/examples/harbor-production.json) |
+| SonarQube | - | [sonarqube-production.json](docs/deployment-contexts/examples/sonarqube-production.json) |
+
+### By Compliance Framework
+
+| Framework | Quick Start | Staging | Production |
+|-----------|-------------|---------|------------|
+| SOC2 | [compliance-soc2-quick.json](docs/deployment-contexts/examples/compliance-soc2-quick.json) | [compliance-soc2-staging.json](docs/deployment-contexts/examples/compliance-soc2-staging.json) | [compliance-soc2-production.json](docs/deployment-contexts/examples/compliance-soc2-production.json) |
+| HIPAA | [compliance-hipaa-quick.json](docs/deployment-contexts/examples/compliance-hipaa-quick.json) | - | [compliance-hipaa-production.json](docs/deployment-contexts/examples/compliance-hipaa-production.json) |
+| PCI-DSS | - | - | [compliance-pci-dss-production.json](docs/deployment-contexts/examples/compliance-pci-dss-production.json) |
+
+### By Environment & Cost
+
+| Environment | Template | Cost Estimate |
+|-------------|----------|---------------|
+| Dev Minimal | [dev-minimal.json](docs/deployment-contexts/dev-minimal.json) | ~$35/month |
+| Dev Standard | [dev-standard.json](docs/deployment-contexts/dev-standard.json) | ~$95/month |
+| Staging SOC2 | [staging-soc2.json](docs/deployment-contexts/staging-soc2.json) | ~$220/month |
+| Production SOC2 | [production-soc2.json](docs/deployment-contexts/production-soc2.json) | ~$400/month |
+| Production HIPAA | [production-hipaa.json](docs/deployment-contexts/production-hipaa.json) | ~$550/month |
+| Production PCI-DSS | [production-pci-dss.json](docs/deployment-contexts/production-pci-dss.json) | ~$710/month |
+
+---
+
+## Documentation
+
+### Getting Started
+| Guide | Description |
+|-------|-------------|
+| [Interactive Deployer Guide](docs/guides/INTERACTIVE_DEPLOYER.md) | Step-by-step CLI deployment |
+| [Deployment Context Reference](docs/deployment-contexts/README.md) | Configuration options and templates |
+| [Deployment Context Examples](docs/deployment-contexts/examples/README.md) | Ready-to-use JSON configurations |
+
+### Applications
+| Guide | Description |
+|-------|-------------|
+| [Application Catalog](docs/applications/README.md) | All supported applications with compliance requirements |
+| [Application Guides](docs/guides/applications/README.md) | Per-application deployment guides |
+| [Application Compliance](docs/applications/COMPLIANCE.md) | Compliance requirements by application |
+| [OIDC Authentication](docs/applications/OIDC.md) | SSO/OIDC setup with Cognito, Identity Center |
+
+### Compliance
+| Guide | Description |
+|-------|-------------|
+| [Compliance Overview](docs/compliance/README.md) | Automated compliance enforcement |
+| [Quick Start Guide](docs/compliance/QUICK_START_GUIDE.md) | Fast path to compliance |
+| [Deployment Guide](docs/compliance/DEPLOYMENT_GUIDE.md) | Detailed deployment instructions |
+| [Multi-Framework Compliance](docs/compliance/MULTI_FRAMEWORK_COMPLIANCE.md) | HIPAA + SOC2 + PCI-DSS together |
+| [PCI-DSS Compliance](docs/compliance/PCI_DSS_COMPLIANCE.md) | Payment card industry requirements |
+| [PCI-DSS Application Security](docs/compliance/PCI_DSS_APPLICATION_SECURITY.md) | Application-level PCI-DSS controls |
+| [Controls Implementation](docs/compliance/CONTROLS_IMPLEMENTATION.md) | Detailed control mapping |
+
+### Plugin System
+| Guide | Description |
+|-------|-------------|
+| [Plugin System Overview](docs/plugins/README.md) | Plugin architecture introduction |
+| [Plugin Ecosystem](docs/plugins/PLUGIN-ECOSYSTEM.md) | Built-in and community plugins |
+| [Application Plugin Guide](docs/plugins/APPLICATION-PLUGIN-GUIDE.md) | Build custom application plugins |
+| [Compliance Plugin Guide](docs/plugins/COMPLIANCE-PLUGIN-GUIDE.md) | Build custom compliance validators |
+
+### Setup & Configuration
+| Guide | Description |
+|-------|-------------|
+| [AWS Identity Center Setup](docs/setup/AWS_IDENTITY_CENTER_SETUP.md) | Enterprise SSO configuration |
+| [Cognito MFA Setup](docs/setup/COGNITO_MFA_COMPLIANCE_SETUP.md) | MFA for compliance requirements |
+| [IAM Rules](docs/guides/IAM_RULES.md) | IAM policy configuration |
+| [Security Rules](docs/guides/SECURITY_RULES_README.md) | Security group configuration |
+| [Database Deployment](docs/databases/DATABASE-DEPLOYMENT-GUIDE.md) | PostgreSQL, Redis deployment |
+
+---
+
+## Project Structure
+
+```
+cloudforge-sample/
+├── src/main/java/com/cloudforgeci/samples/
+│   ├── app/
+│   │   ├── CloudForgeCommunitySample.java    # Main CDK app entry point
+│   │   └── InteractiveDeployer.java          # Interactive CLI deployer
+│   ├── launchers/
+│   │   ├── ApplicationEc2Stack.java          # Universal EC2 deployment stack
+│   │   └── ApplicationFargateStack.java      # Universal Fargate deployment stack
+│   └── plugins/
+│       ├── application/
+│       │   └── SonarQubeApplicationSpec.java # Example application plugin
+│       └── compliance/
+│           └── CustomSecurityPolicyRules.java # Example compliance plugin
+├── docs/
+│   ├── applications/      # Application catalog and specs
+│   ├── compliance/        # Compliance framework documentation
+│   ├── databases/         # Database deployment guides
+│   ├── deployment-contexts/ # Ready-to-use JSON templates
+│   ├── guides/            # Implementation guides
+│   ├── plugins/           # Plugin development documentation
+│   └── setup/             # Initial setup guides
+└── src/main/resources/META-INF/services/
+    ├── com.cloudforge.core.interfaces.ApplicationSpec
+    └── com.cloudforge.core.interfaces.FrameworkRules
 ```
 
-#### Interactive Mode
-```bash
-java -cp "target/classes:target/dependency/*" com.cloudforgeci.samples.app.InteractiveDeployer
-```
+---
 
-## 🔧 Deployment Context
+## Plugin System
 
-Control deployments without editing Java code.
+CloudForge uses Java's ServiceLoader for plugin discovery, enabling extensibility without modifying core code.
 
-### Current usable context keys
+### Application Plugins
 
-| Key                    | Values / Example                          | Default                                   | Notes                                          |
-|------------------------|-------------------------------------------|-------------------------------------------|------------------------------------------------|
-| `runtime`              | `ec2` / `fargate`                         | `*-domain` variants expect Route53 + ACM. |
-| `env`                  | `dev`                                     | `stage`                                   | `prod`                                         | `dev`                | Used for naming + tagging. |
-| `domain`               | `example.com`                             | _none_                                    | Used with `subdomain` if `fqdn` not set.       |
-| `subdomain`            | `jenkins`                                 | _none_                                    | Used to build `fqdn`.                          |
-| `fqdn`                 | `jenkins.example.com`                     | _none_                                    | Wins over domain + subdomain.                  |
-| `domain`               | `example.com`                             | _none_                                    | Must exist in Route53 for `*-domain` variants. |
-| `topology`             | `service` / `single-node`                 | `service`                                 | Future free support for S3, SES, Lambda        |
-| `enableSsl`            | `true` / `false`                          | `false`                                   | Enterprise only.                               |
-| `enableFlowlogs`       | `true` / `false`                          | `false`                                   | Optional CloudFront in front of ALB.           |
-| `authMode`             | `none` / `alb-oidc`/ `jenkins-oidc`       | `none`                                    | Enterprise: integrates SSO.                    |
-| `ssoInstanceArn`       | `arn:aws:sso::...`                        | _none_                                    | Enterprise only.                               |
-| `ssoGroupId`           | `UUID`                                    | _none_                                    | Enterprise only.                               |
-| `ssoTargetAccountId`   | `123456789012`                            | _none_                                    | Enterprise only.                               |
-| `artifactsBucket`      | `my-ci-artifacts`                         | _auto_                                    | Custom bucket for build artifacts.             |
-| `artifactsPrefix`      | `jenkins/job/${JOB_NAME}/${BUILD_NUMBER}` | default shown                             | S3 key prefix.                                 |
-| `lbType`               | `alb`                                     | `alb`                                     | Type of load balancer.                         |
-| `cpu`                  | integer (Fargate vCPU, e.g. `1024`)       | `1024`                                    | Task size for Fargate.                         |
-| `memory`               | integer (MiB, e.g. `2048`)                | `2048`                                    | Task size for Fargate.                         |
-| `minInstanceCapacity`  | integer (Minimum Instances e.g. `2`       | `0`                                       | Minimum Instance Capacity                      |
-| `maxInstanceCapacity`  | integer (Minimum Instances e.g. `10`      | `0`                                       | Maximum Instance Capacity                      |
-| `cpuTargetUtilization` | integer (Minimum Instances e.g. `75`      | `60`                                      | CPU Target Utilization                         |
+Define new applications by implementing the `ApplicationSpec` interface:
 
+```java
+public class MyAppSpec implements ApplicationSpec {
+    @Override
+    public String applicationId() { return "myapp"; }
 
- ---
+    @Override
+    public String defaultContainerImage() { return "myapp/myapp:latest"; }
 
-**Topology**
-
-*Service (scalable / highly-available)*
-
-Runs Jenkins as a managed service (ECS/Fargate service or an EC2 Auto Scaling Group) behind an ALB. Auto Scaling policies add/remove tasks or instances based on load (CPU/memory, request rate, queue depth). You get rolling updates, self-healing, and minimal downtime. Requires shared storage (e.g., EFS) for the Jenkins home so new tasks come up warm. Best for teams, bursty CI, and uptime expectations.
-
-*Single Node (simple / cost-lean)*
-
-One Jenkins controller (a single Fargate task or EC2 instance) with no horizontal scaling. Fewer moving parts, lower cost, and straightforward ops—but restarts mean brief downtime and throughput is capped at that one node. Use EBS (EC2) or EFS (Fargate) if you want persistence. Great for dev, POCs, solo use, or steady low-volume pipelines.
-
-
-### `cdk.json` example
-
-```json
-{
-  "app": "java -cp target/classes:target/dependency/* com.cloudforgeci.samples.app.InteractiveDeployer",
-  "context": {}
+    @Override
+    public int applicationPort() { return 8080; }
+    // ... other methods
 }
 ```
 
+Register in `META-INF/services/com.cloudforge.core.interfaces.ApplicationSpec`:
+```
+com.example.plugins.MyAppSpec
+```
 
-## 🆓 Free vs Enterprise
+See [Application Plugin Guide](docs/plugins/APPLICATION-PLUGIN-GUIDE.md) for details.
 
-CloudForgeCI comes in two editions:
+### Compliance Plugins
 
-- **Free Edition**
-  - Fully open, with no restrictions.
-  - Use in personal, enterprise, or commercial projects at no cost.
-  - Includes core features: EC2/Fargate deploys, ALB, Domain/Subdomain, SSL, Multi-AZ.
+Define custom compliance rules by implementing the `FrameworkRules` interface:
 
-- **Enterprise Edition** *(commercial)*
-  - Adds advanced features for production workloads:
-    - Web Application Firewall (WAF)
-    - Private Endpoints (ECR, S3, CloudWatch)
-    - Single Sign-On (SSO with ALB IdP + Jenkins integration)
-    - Automated Backups
-    - Advanced Monitoring
-  - Commercial support & feature roadmap.
+```java
+public class MyComplianceRules implements FrameworkRules {
+    @Override
+    public String frameworkId() { return "MY-FRAMEWORK"; }
 
-- **Veteran-Owned Businesses** ❤️
-  - Eligible to receive **Enterprise Edition features free of charge**.
-  - Our way of honoring and supporting those who’ve served.
+    @Override
+    public List<ConfigRule> getConfigRules() { /* ... */ }
+}
+```
 
-**Bottom line:** start free, scale into enterprise features when your needs demand it — or claim full Enterprise benefits free if you’re a veteran-owned business.
+Register in `META-INF/services/com.cloudforge.core.interfaces.FrameworkRules`:
+```
+com.example.plugins.MyComplianceRules
+```
 
+See [Compliance Plugin Guide](docs/plugins/COMPLIANCE-PLUGIN-GUIDE.md) for details.
+
+---
+
+## Authentication Options
+
+CloudForge supports multiple authentication modes:
+
+| Mode | Description | Use Case |
+|------|-------------|----------|
+| `none` | Application-native authentication | Development, simple setups |
+| `alb-oidc` | ALB-level OIDC authentication | All requests authenticated at load balancer |
+| `application-oidc` | Application-level OIDC | Full group/role mapping, public pages support |
+
+### Supported Providers
+
+- **Amazon Cognito** - Managed user directory with MFA support
+- **AWS IAM Identity Center** - Enterprise SSO integration
+- **External OIDC** - Okta, Auth0, Azure AD, or any OIDC-compliant provider
+
+See [OIDC Authentication Guide](docs/applications/OIDC.md) for configuration details.
+
+---
+
+## Compliance Frameworks
+
+CloudForge provides automated compliance enforcement:
+
+| Framework | Description | Key Controls |
+|-----------|-------------|--------------|
+| **SOC2** | Service Organization Control 2 | Access control, encryption, audit logging |
+| **PCI-DSS** | Payment Card Industry | Cardholder data protection, network security |
+| **HIPAA** | Healthcare data protection | PHI encryption, audit trails, access controls |
+| **GDPR** | EU data privacy | Data protection, consent management |
+
+### Automated Controls
+
+- Intelligent S3 lifecycle management (Standard -> Glacier -> Deep Archive)
+- IAM password policy enforcement with auto-remediation
+- CloudTrail audit logging with immutable storage
+- AWS Config continuous compliance monitoring
+- Encryption at rest for all storage (EFS, EBS, S3)
+
+See [Compliance Overview](docs/compliance/README.md) for details.
+
+---
+
+## Free vs Enterprise
+
+CloudForge comes in two editions:
+
+### Free Edition
+- Fully open, with no restrictions
+- Use in personal, enterprise, or commercial projects at no cost
+- Includes core features: EC2/Fargate deploys, ALB, Domain/Subdomain, SSL, Multi-AZ
+
+### Enterprise Edition
+Adds advanced features for production workloads:
+- Web Application Firewall (WAF)
+- Private Endpoints (ECR, S3, CloudWatch)
+- Single Sign-On (SSO with ALB IdP + application integration)
+- Automated Backups
+- Advanced Monitoring
+- Commercial support & feature roadmap
+
+### Veteran-Owned Businesses
+Eligible to receive **Enterprise Edition features free of charge**. Our way of honoring and supporting those who've served.
+
+---
+
+## Support
+
+- **Documentation**: See the [docs/](docs/) directory
+- **Issues**: [GitHub Issues](https://github.com/CloudForgeCI/cloudforge-sample/issues)
+
+---
+
+## License
+
+Apache 2.0 - See [LICENSE](LICENSE) for details.
