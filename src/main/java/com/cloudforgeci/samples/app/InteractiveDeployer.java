@@ -492,6 +492,17 @@ public class InteractiveDeployer {
             config.authMode = promptChoice("Authentication Mode",
                 oidcAuthModes.toArray(String[]::new), recommendedAuthMode);
         }
+
+        // OIDC requires SSL - auto-enable if not already set
+        if (!config.enableSsl) {
+            config.enableSsl = true;
+            if (config.domain == null || config.domain.isEmpty()) {
+                System.out.println("\n🔒 SSL automatically enabled (OIDC requires HTTPS)");
+                System.out.println("   Using AWS Private CA for ALB DNS name (~$400/month, auto-deleted with stack)");
+            } else {
+                System.out.println("\n🔒 SSL automatically enabled (OIDC requires HTTPS)");
+            }
+        }
     }
 
     private static void configureCognitoOidc(DeploymentConfig config, List<String> supportedAuthModes, String recommendedAuthMode) {
@@ -625,6 +636,17 @@ public class InteractiveDeployer {
         // For SAML apps, use application-oidc mode (auth happens at application level)
         config.authMode = "application-oidc";
         System.out.println("\n✅ Using application-oidc mode (SAML authentication at application level)");
+
+        // OIDC/SAML requires SSL - auto-enable if not already set
+        if (!config.enableSsl) {
+            config.enableSsl = true;
+            if (config.domain == null || config.domain.isEmpty()) {
+                System.out.println("\n🔒 SSL automatically enabled (OIDC/SAML requires HTTPS)");
+                System.out.println("   Using AWS Private CA for ALB DNS name (~$400/month, auto-deleted with stack)");
+            } else {
+                System.out.println("\n🔒 SSL automatically enabled (OIDC/SAML requires HTTPS)");
+            }
+        }
     }
 
     private static void configureExternalOidc(DeploymentConfig config, List<String> supportedAuthModes, String recommendedAuthMode) {
