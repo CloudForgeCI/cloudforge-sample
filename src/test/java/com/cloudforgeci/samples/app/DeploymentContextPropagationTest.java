@@ -1,9 +1,9 @@
 package com.cloudforgeci.samples.app;
 
 import com.cloudforgeci.api.core.DeploymentContext;
-import com.cloudforgeci.api.interfaces.RuntimeType;
-import com.cloudforgeci.api.interfaces.SecurityProfile;
-import com.cloudforgeci.api.interfaces.TopologyType;
+import com.cloudforge.core.enums.RuntimeType;
+import com.cloudforge.core.enums.SecurityProfile;
+import com.cloudforge.core.enums.TopologyType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import software.amazon.awscdk.App;
@@ -83,7 +83,7 @@ class DeploymentContextPropagationTest {
 
         // Then - Verify all fields loaded correctly
         // Basic fields
-        // Note: stackName is not part of DeploymentContext, it's passed separately to stack constructors
+        assertEquals("test-stack", cfc.stackName());
         assertEquals("staging", cfc.env());
         assertEquals(RuntimeType.FARGATE, cfc.runtime());
         assertEquals(TopologyType.JENKINS_SERVICE, cfc.topology());
@@ -231,13 +231,12 @@ class DeploymentContextPropagationTest {
         app1.getNode().setContext("cfc", context1);
         assertEquals(TopologyType.JENKINS_SERVICE, DeploymentContext.from(app1).topology());
 
-        // Test JENKINS_SINGLE_NODE (requires runtime=EC2)
+        // Test S3_WEBSITE
         App app2 = new App();
         Map<String, Object> context2 = createMinimalContext();
-        context2.put("topology", "JENKINS_SINGLE_NODE");
-        context2.put("runtime", "EC2");  // JENKINS_SINGLE_NODE requires EC2
+        context2.put("topology", "S3_WEBSITE");
         app2.getNode().setContext("cfc", context2);
-        assertEquals(TopologyType.JENKINS_SINGLE_NODE, DeploymentContext.from(app2).topology());
+        assertEquals(TopologyType.S3_WEBSITE, DeploymentContext.from(app2).topology());
     }
 
     /**
