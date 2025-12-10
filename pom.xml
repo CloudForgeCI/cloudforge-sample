@@ -37,18 +37,16 @@
         <artifactId>cloudforge-api</artifactId>
     </dependency>
 
-    <!-- AWS CDK - explicit dependency for IDE support -->
+    <!-- AWS CDK - version managed by cfc-core BOM -->
     <dependency>
         <groupId>software.amazon.awscdk</groupId>
         <artifactId>aws-cdk-lib</artifactId>
-        <version>2.170.0</version>
     </dependency>
 
     <!-- CDK Constructs -->
     <dependency>
         <groupId>software.constructs</groupId>
         <artifactId>constructs</artifactId>
-        <version>10.4.2</version>
     </dependency>
 
     <!-- CDK Nag for compliance checks (not in BOM - project-specific) -->
@@ -78,16 +76,14 @@
         <plugins>
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
-                <version>3.4.1</version> <!-- Use a recent version -->
+                <version>3.4.1</version>
                 <configuration>
-                    <excludeDefaultDirectories>true</excludeDefaultDirectories>
                     <filesets>
                         <fileset>
                             <directory>${project.basedir}/cdk.out</directory>
                             <includes>
                                 <include>**/*.json</include>
                             </includes>
-                            <followSymlinks>false</followSymlinks>
                         </fileset>
                     </filesets>
                 </configuration>
