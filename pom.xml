@@ -17,7 +17,7 @@
             <dependency>
                 <groupId>com.cloudforgeci</groupId>
                 <artifactId>cfc-core</artifactId>
-                <version>3.0.0-SNAPSHOT</version>
+                <version>3.0.1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -26,31 +26,29 @@
 
 <dependencies>
     <!-- CloudForge Core - contains enums, interfaces, and base models -->
-    <!-- Version managed by BOM -->
     <dependency>
         <groupId>com.cloudforgeci</groupId>
         <artifactId>cloudforge-core</artifactId>
     </dependency>
 
     <!-- CloudForge API - contains factories and deployment logic -->
-    <!-- Version managed by BOM -->
     <dependency>
         <groupId>com.cloudforgeci</groupId>
         <artifactId>cloudforge-api</artifactId>
     </dependency>
 
     <!-- AWS CDK - explicit dependency for IDE support -->
-    <!-- Version managed by BOM -->
     <dependency>
         <groupId>software.amazon.awscdk</groupId>
         <artifactId>aws-cdk-lib</artifactId>
+        <version>2.170.0</version>
     </dependency>
 
     <!-- CDK Constructs -->
-    <!-- Version managed by BOM -->
     <dependency>
         <groupId>software.constructs</groupId>
         <artifactId>constructs</artifactId>
+        <version>10.4.2</version>
     </dependency>
 
     <!-- CDK Nag for compliance checks (not in BOM - project-specific) -->
@@ -68,10 +66,11 @@
         <scope>test</scope>
     </dependency>
 
-    <!-- Jackson for JSON serialization - version managed by BOM -->
+    <!-- Jackson for JSON serialization -->
     <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
+        <version>2.18.2</version>
     </dependency>
 </dependencies>
 
