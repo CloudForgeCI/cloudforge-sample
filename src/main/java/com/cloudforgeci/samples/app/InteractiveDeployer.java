@@ -1770,11 +1770,11 @@ public class InteractiveDeployer {
                 System.out.println("\n🗑️  Deleting existing stack...");
                 runCdkDestroy(config.stackName);
                 System.out.println("\n🚀 Starting CDK deployment...");
-                runCdkDeploy("--require-approval", "never");
+                runCdkDeploy();
             }
             case "4" -> {
                 System.out.println("\n📋 Synthesis complete. To create changeset (dry-run), run:");
-                System.out.println("   cdk deploy --no-execute --require-approval never");
+                System.out.println("   cdk deploy --no-execute");
             }
             case "5" -> {
                 exportTemplate(config.stackName);
