@@ -22,16 +22,22 @@ This repository demonstrates the CloudForge platform with opinionated defaults, 
 
 ### Option 1: Interactive Deployer (Recommended)
 
-```bash
-# Run the interactive deployer
-./deploy-interactive.sh
+The interactive deployer guides you through configuration choices and generates a deployment context file.
 
-# Or manually
-mvn compile
-mvn exec:java -Dexec.mainClass="com.cloudforgeci.samples.app.InteractiveDeployer"
+```bash
+# Synthesize with interactive prompts (creates deployment-context.json)
+cdk synth
+
+# Review the generated CloudFormation template, then deploy
+cdk deploy
+
+# Or preview changes without executing
+cdk deploy --no-execute
 ```
 
 ### Option 2: Deployment Context File
+
+Use a pre-configured template for faster deployments.
 
 ```bash
 # Copy a deployment context template
@@ -67,29 +73,18 @@ cdk deploy -c cfc=@deployment-context.json
 | **Analytics** | Metabase, Apache Superset |
 | **Code Quality** | SonarQube |
 
-See [Application Catalog](docs/applications/README.md) for detailed documentation on each application.
-
 ---
 
-## Deployment Context
+## Documentation
 
-Control deployments via JSON configuration without editing Java code.
+📚 **[Complete Documentation](https://cloudforgeci.github.io/cfc-core/documentation/)**
 
-### Key Configuration Options
-
-| Key | Values / Example | Default | Notes |
-|-----|------------------|---------|-------|
-| `applicationId` | `jenkins`, `gitlab`, `grafana`, etc. | _required_ | Application to deploy |
-| `runtime` | `ec2` / `fargate` | `fargate` | Compute type |
-| `securityProfile` | `dev` / `staging` / `production` | `dev` | Security posture |
-| `env` | `dev` / `stage` / `prod` | `dev` | Environment name |
-| `domain` | `example.com` | _none_ | Route53 domain |
-| `subdomain` | `jenkins` | _none_ | Service subdomain |
-| `topology` | `service` / `single-node` | `service` | Scaling mode |
-| `authMode` | `none` / `alb-oidc` / `application-oidc` | `none` | Authentication |
-| `complianceFrameworks` | `SOC2,HIPAA,PCI-DSS` | _none_ | Compliance frameworks |
-
-See [Deployment Context Reference](docs/deployment-contexts/README.md) for the complete configuration guide.
+For comprehensive guides, API references, and detailed configuration options, visit the hosted documentation:
+- Application catalog and deployment guides
+- Deployment context configuration reference
+- Compliance framework implementation
+- Plugin development guides
+- Authentication and security setup
 
 ---
 
@@ -130,48 +125,20 @@ See [Deployment Context Reference](docs/deployment-contexts/README.md) for the c
 
 ## Documentation
 
-### Getting Started
-| Guide | Description |
-|-------|-------------|
-| [Interactive Deployer Guide](docs/guides/INTERACTIVE_DEPLOYER.md) | Step-by-step CLI deployment |
-| [Deployment Context Reference](docs/deployment-contexts/README.md) | Configuration options and templates |
-| [Deployment Context Examples](docs/deployment-contexts/examples/README.md) | Ready-to-use JSON configurations |
+📚 **[Complete Documentation](https://cloudforgeci.github.io/cfc-core/documentation/)**
 
-### Applications
-| Guide | Description |
-|-------|-------------|
-| [Application Catalog](docs/applications/README.md) | All supported applications with compliance requirements |
-| [Application Guides](docs/guides/applications/README.md) | Per-application deployment guides |
-| [Application Compliance](docs/applications/COMPLIANCE.md) | Compliance requirements by application |
-| [OIDC Authentication](docs/applications/OIDC.md) | SSO/OIDC setup with Cognito, Identity Center |
+Visit the hosted documentation for comprehensive guides and API references.
 
-### Compliance
-| Guide | Description |
-|-------|-------------|
-| [Compliance Overview](docs/compliance/README.md) | Automated compliance enforcement |
-| [Quick Start Guide](docs/compliance/QUICK_START_GUIDE.md) | Fast path to compliance |
-| [Deployment Guide](docs/compliance/DEPLOYMENT_GUIDE.md) | Detailed deployment instructions |
-| [Multi-Framework Compliance](docs/compliance/MULTI_FRAMEWORK_COMPLIANCE.md) | HIPAA + SOC2 + PCI-DSS together |
-| [PCI-DSS Compliance](docs/compliance/PCI_DSS_COMPLIANCE.md) | Payment card industry requirements |
-| [PCI-DSS Application Security](docs/compliance/PCI_DSS_APPLICATION_SECURITY.md) | Application-level PCI-DSS controls |
-| [Controls Implementation](docs/compliance/CONTROLS_IMPLEMENTATION.md) | Detailed control mapping |
+### Quick Links
 
-### Plugin System
-| Guide | Description |
-|-------|-------------|
-| [Plugin System Overview](docs/plugins/README.md) | Plugin architecture introduction |
-| [Plugin Ecosystem](docs/plugins/PLUGIN-ECOSYSTEM.md) | Built-in and community plugins |
-| [Application Plugin Guide](docs/plugins/APPLICATION-PLUGIN-GUIDE.md) | Build custom application plugins |
-| [Compliance Plugin Guide](docs/plugins/COMPLIANCE-PLUGIN-GUIDE.md) | Build custom compliance validators |
+- **[Getting Started](https://cloudforgeci.github.io/cfc-core/documentation/guides/interactive-deployer)** - Interactive deployment guide
+- **[Application Catalog](https://cloudforgeci.github.io/cfc-core/documentation/applications/)** - All supported applications
+- **[Deployment Context Reference](https://cloudforgeci.github.io/cfc-core/documentation/deployment-contexts/)** - Configuration options
+- **[Compliance Frameworks](https://cloudforgeci.github.io/cfc-core/documentation/compliance/)** - SOC2, HIPAA, PCI-DSS
+- **[Plugin Development](https://cloudforgeci.github.io/cfc-core/documentation/plugins/)** - Build custom plugins
+- **[Authentication Setup](https://cloudforgeci.github.io/cfc-core/documentation/applications/oidc)** - SSO and OIDC configuration
 
-### Setup & Configuration
-| Guide | Description |
-|-------|-------------|
-| [AWS Identity Center Setup](docs/setup/AWS_IDENTITY_CENTER_SETUP.md) | Enterprise SSO configuration |
-| [Cognito MFA Setup](docs/setup/COGNITO_MFA_COMPLIANCE_SETUP.md) | MFA for compliance requirements |
-| [IAM Rules](docs/guides/IAM_RULES.md) | IAM policy configuration |
-| [Security Rules](docs/guides/SECURITY_RULES_README.md) | Security group configuration |
-| [Database Deployment](docs/databases/DATABASE-DEPLOYMENT-GUIDE.md) | PostgreSQL, Redis deployment |
+> **Note:** The `/docs` folder in this repository serves as the source for the hosted documentation
 
 ---
 
@@ -210,51 +177,12 @@ cloudforge-sample/
 
 CloudForge uses Java's ServiceLoader for plugin discovery, enabling extensibility without modifying core code.
 
-### Application Plugins
+- **Application Plugins** - Define custom applications by implementing `ApplicationSpec`
+- **Compliance Plugins** - Add custom compliance rules via `FrameworkRules`
 
-Define new applications by implementing the `ApplicationSpec` interface:
+Example plugins are included in [src/main/java/com/cloudforgeci/samples/plugins/](src/main/java/com/cloudforgeci/samples/plugins/).
 
-```java
-public class MyAppSpec implements ApplicationSpec {
-    @Override
-    public String applicationId() { return "myapp"; }
-
-    @Override
-    public String defaultContainerImage() { return "myapp/myapp:latest"; }
-
-    @Override
-    public int applicationPort() { return 8080; }
-    // ... other methods
-}
-```
-
-Register in `META-INF/services/com.cloudforge.core.interfaces.ApplicationSpec`:
-```
-com.example.plugins.MyAppSpec
-```
-
-See [Application Plugin Guide](docs/plugins/APPLICATION-PLUGIN-GUIDE.md) for details.
-
-### Compliance Plugins
-
-Define custom compliance rules by implementing the `FrameworkRules` interface:
-
-```java
-public class MyComplianceRules implements FrameworkRules {
-    @Override
-    public String frameworkId() { return "MY-FRAMEWORK"; }
-
-    @Override
-    public List<ConfigRule> getConfigRules() { /* ... */ }
-}
-```
-
-Register in `META-INF/services/com.cloudforge.core.interfaces.FrameworkRules`:
-```
-com.example.plugins.MyComplianceRules
-```
-
-See [Compliance Plugin Guide](docs/plugins/COMPLIANCE-PLUGIN-GUIDE.md) for details.
+📖 **[Plugin Development Guide](https://cloudforgeci.github.io/cfc-core/documentation/plugins/)**
 
 ---
 
@@ -262,42 +190,28 @@ See [Compliance Plugin Guide](docs/plugins/COMPLIANCE-PLUGIN-GUIDE.md) for detai
 
 CloudForge supports multiple authentication modes:
 
-| Mode | Description | Use Case |
-|------|-------------|----------|
-| `none` | Application-native authentication | Development, simple setups |
-| `alb-oidc` | ALB-level OIDC authentication | All requests authenticated at load balancer |
-| `application-oidc` | Application-level OIDC | Full group/role mapping, public pages support |
+- **`none`** - Application-native authentication (development)
+- **`alb-oidc`** - ALB-level OIDC authentication
+- **`application-oidc`** - Application-level OIDC with group/role mapping
 
-### Supported Providers
+Supports Amazon Cognito, AWS IAM Identity Center, and external OIDC providers (Okta, Auth0, Azure AD).
 
-- **Amazon Cognito** - Managed user directory with MFA support
-- **AWS IAM Identity Center** - Enterprise SSO integration
-- **External OIDC** - Okta, Auth0, Azure AD, or any OIDC-compliant provider
-
-See [OIDC Authentication Guide](docs/applications/OIDC.md) for configuration details.
+📖 **[Authentication Setup Guide](https://cloudforgeci.github.io/cfc-core/documentation/applications/oidc)**
 
 ---
 
 ## Compliance Frameworks
 
-CloudForge provides automated compliance enforcement:
+CloudForge provides automated compliance enforcement for:
 
-| Framework | Description | Key Controls |
-|-----------|-------------|--------------|
-| **SOC2** | Service Organization Control 2 | Access control, encryption, audit logging |
-| **PCI-DSS** | Payment Card Industry | Cardholder data protection, network security |
-| **HIPAA** | Healthcare data protection | PHI encryption, audit trails, access controls |
-| **GDPR** | EU data privacy | Data protection, consent management |
+- **SOC2** - Access control, encryption, audit logging
+- **PCI-DSS** - Cardholder data protection, network security
+- **HIPAA** - PHI encryption, audit trails, access controls
+- **GDPR** - Data protection, consent management
 
-### Automated Controls
+Automated controls include S3 lifecycle management, IAM policy enforcement, CloudTrail audit logging, AWS Config monitoring, and encryption at rest.
 
-- Intelligent S3 lifecycle management (Standard -> Glacier -> Deep Archive)
-- IAM password policy enforcement with auto-remediation
-- CloudTrail audit logging with immutable storage
-- AWS Config continuous compliance monitoring
-- Encryption at rest for all storage (EFS, EBS, S3)
-
-See [Compliance Overview](docs/compliance/README.md) for details.
+📖 **[Compliance Framework Guide](https://cloudforgeci.github.io/cfc-core/documentation/compliance/)**
 
 ---
 
@@ -326,7 +240,7 @@ Eligible to receive **Enterprise Edition features free of charge**. Our way of h
 
 ## Support
 
-- **Documentation**: See the [docs/](docs/) directory
+- **Documentation**: [https://cloudforgeci.github.io/cfc-core/documentation/](https://cloudforgeci.github.io/cfc-core/documentation/)
 - **Issues**: [GitHub Issues](https://github.com/CloudForgeCI/cloudforge-sample/issues)
 
 ---
